@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do App</title>
+</head>
+<body>
+<h1>My To-Do List</h1>
+<ul id="todo-list"></ul>
+
+<form action="/todo" method="post">
+    <input type="text" name="description" placeholder="New task" required>
+    <button type="submit">Add To-Do</button>
+</form>
+
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const todoList = document.getElementById('todo-list');
+
+        todoList.addEventListener('change', function (event) {
+            if (event.target && event.target.classList.contains('todo-checkbox')) {
+                const checkbox = event.target;
+                const todoId = checkbox.getAttribute('data-id');
+                const completed = checkbox.checked;
+
+                fetch(`/todo/${todoId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({completed: completed})
+                })
+                    .then(response => {
+                        if (response.redirected) {
+                            // Manually handle the redirect
+                            window.location.href = response.url;
+                        } else {
+                            console.log('Todo updated:', response);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating todo:', error);
+                    });
+            }
+        });
+    });
+</script>
+
+</html>
